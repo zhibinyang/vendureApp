@@ -1,5 +1,8 @@
 <h1 style="margin: 30px 0 30px; font-weight: bold;">E-Commerce application with React Native, GraphQL and TypeScript</h1>
 
+> [!NOTE]
+> This project is a fork of [Vendure App](https://github.com/Josemarsilvestre/vendureApp) and has been upgraded to **Expo SDK 54**.
+
 It is a complete App developed by React Native (Expo), inspired by Vendure, an eCommerce platform made for developers who want to create customizable and flexible online stores. 
 
 This app, "Vendure App", uses the Vendure API for products, users and more. Below you have the link to the site in case you feel the need to edit some data, add users or even transform it in your own way.
