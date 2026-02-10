@@ -46,18 +46,18 @@ const Loading: React.FC<LoadingProps> = ({ style }) => {
 
   return (
     <View style={[styles.constainer_Loading, style]}>
-        <Animated.View
-        style={[styles.AnimatedStyle, { left: moderateScale(8, 0.1) }, animatedOnePointStyles]}
-        />
-        <Animated.View
-        style={[styles.AnimatedStyle, { left: moderateScale(8, 0.1) }, animatedTwoPointStyles]}
-        />
-        <Animated.View
-        style={[styles.AnimatedStyle, { left: moderateScale(32, 0.1) }, animatedThreePointStyles]}
-        />
-        <Animated.View
-        style={[styles.AnimatedStyle, { left: moderateScale(56, 0.1) }, animatedFourPointStyles]}
-        />
+      <Animated.View
+        style={[styles.AnimatedStyle, { left: Math.round(moderateScale(8, 0.1)) }, animatedOnePointStyles]}
+      />
+      <Animated.View
+        style={[styles.AnimatedStyle, { left: Math.round(moderateScale(8, 0.1)) }, animatedTwoPointStyles]}
+      />
+      <Animated.View
+        style={[styles.AnimatedStyle, { left: Math.round(moderateScale(32, 0.1)) }, animatedThreePointStyles]}
+      />
+      <Animated.View
+        style={[styles.AnimatedStyle, { left: Math.round(moderateScale(56, 0.1)) }, animatedFourPointStyles]}
+      />
     </View>
 
   )
