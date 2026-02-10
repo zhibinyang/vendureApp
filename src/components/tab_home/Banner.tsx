@@ -51,7 +51,7 @@ const Banner: React.FC<BannerProps> = ({ navigation, query, title }) => {
               }}
             >
               <View
-                style={[styles.imageContainer, { width: moderateScale(250, 0.1) }]}
+                style={[styles.imageContainer, { width: Math.round(moderateScale(250, 0.1)) }]}
                 key={items_.id}
               >
                 <Image
@@ -88,26 +88,26 @@ const Banner: React.FC<BannerProps> = ({ navigation, query, title }) => {
 
 const styles = StyleSheet.create({
   imageContainer: {
-    height: "70%",
-    marginRight: moderateScale(-95, 0.1),
+    height: Math.round(moderateScale(150, 0.1)),
+    marginRight: Math.round(moderateScale(-95, 0.1)),
   },
   image: {
     width: "60%",
     height: "100%",
-    borderRadius: moderateScale(10, 0.1),
+    borderRadius: Math.round(moderateScale(10, 0.1)),
   },
   text: {
     color: "#4d4d4d",
-    maxWidth: moderateScale(155, 0.1),
-    marginTop: moderateScale(3, 0.1),
+    maxWidth: Math.round(moderateScale(155, 0.1)),
+    marginTop: Math.round(moderateScale(3, 0.1)),
     textAlign: "left",
   },
   priceText: {
-    marginRight: moderateScale(5, 0.1),
+    marginRight: Math.round(moderateScale(5, 0.1)),
     color: "#4d4d4d",
   },
   priceContainer: {
-    marginTop: moderateScale(-1, 0.1),
+    marginTop: Math.round(moderateScale(-1, 0.1)),
     flexDirection: "row",
   },
 });
