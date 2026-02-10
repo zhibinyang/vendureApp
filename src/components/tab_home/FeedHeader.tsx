@@ -39,7 +39,7 @@ const FeedHeader: React.FC<FeedHeaderProps> = ({
             onPress={() => navigation.navigate("Cart")}
             style={styles.cartIconContainer}
           >
-            <Icons.AntDesign name="shoppingcart" size={moderateScale(24, 0.1)} color="#1F2937" />
+            <Icons.AntDesign name="shopping-cart" size={moderateScale(24, 0.1)} color="#1F2937" />
           </TouchableOpacity>
         </View>
       </View>

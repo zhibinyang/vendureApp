@@ -11,7 +11,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@apollo/client": "^3.9.10",
+    "@apollo/client": "3.13.3",
     "@expo/vector-icons": "^15.0.3",
     "@hookform/resolvers": "^3.3.4",
     "@react-native-community/slider": "5.0.1",
