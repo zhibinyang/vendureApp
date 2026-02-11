@@ -11,6 +11,8 @@ import { ProductCard as Product } from "../../../../utils/interface";
 import { moderateScale } from "react-native-size-matters";
 import { useMutation } from "@apollo/client";
 
+import { tracker } from "../../../utils/tracker";
+
 import Icons from "../../common/Icons";
 import ProductPrice from "../ProductPrice";
 import styles from "./style/style.productCard";
@@ -43,9 +45,24 @@ const ProductList: React.FC<ProductListProps> = ({
   const [addedToCartMap, setAddedToCartMap] = useState<{ [key: string]: boolean }>({});
   const [addToCart] = useMutation(ADD_TO_CART);
 
-  const handleAddToCart = (itemId: string) => {
+  const handleAddToCart = (item: any) => {
+    const itemId = item.id;
     addToCart({ variables: { id_: itemId, quantity_: 1 } });
     refetch();
+
+    // TRACKING: add_to_cart
+    tracker.trackEvent('add_to_cart', {
+      currency: item.currencyCode,
+      value: item.price / 100, // Net price is usually integer cents, convert to main unit
+      items: [{
+        item_id: item.id,
+        item_name: item.name,
+        price: item.price / 100, // Net price
+        currency: item.currencyCode,
+        quantity: 1,
+        item_variant: item.variants?.[0]?.sku || item.id,
+      }]
+    });
 
     setAddedToCartMap((prevState) => ({
       ...prevState,
@@ -85,6 +102,7 @@ const ProductList: React.FC<ProductListProps> = ({
               }
             >
               <View style={styles.cardContent} key={items_?.id}>
+                {/* ... image container ... */}
                 <View style={[styles.imageContainer, { width: moderateScale(250, 0.1) }]}>
                   <Image
                     source={{
@@ -116,7 +134,7 @@ const ProductList: React.FC<ProductListProps> = ({
                           ? styles.addedButton
                           : styles.addButton
                       }
-                      onPress={() => handleAddToCart(String(items_.id))}
+                      onPress={() => handleAddToCart(items_)}
                     >
                       <Text style={styles.addButtonText}>
                         {addedToCartMap[items_.id]

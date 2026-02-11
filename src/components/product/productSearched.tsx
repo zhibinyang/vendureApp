@@ -21,8 +21,10 @@ import PageLoading from "../loading/PageLoading";
 import SimilarProducts from "./Similarproducts";
 import { moderateScale } from "react-native-size-matters";
 
+import { tracker } from "../../utils/tracker";
+
 export default function ProductSearchedScreen({ route, navigation }) {
-  const { productId, productVariantID, name, price, categoryID, currencyCode } = route.params;
+  const { productId, productVariantID, name, price, netPrice, categoryID, currencyCode } = route.params;
   const { data, loading, error } = useQuery(PRODUCT_SEARCHED_QUERY, {
     variables: { id: productId },
   });
@@ -65,6 +67,22 @@ export default function ProductSearchedScreen({ route, navigation }) {
   const handleAddToCart = (productVariantID) => {
     addToCart({ variables: { id_: productVariantID, quantity_: 1 } });
     refetch();
+
+    // TRACKING: add_to_cart
+    // netPrice is usually passed from list. If not, fallback to price (which might be gross)
+    const priceVal = netPrice !== undefined ? netPrice : price;
+    tracker.trackEvent('add_to_cart', {
+      currency: currencyCode,
+      value: priceVal / 100,
+      items: [{
+        item_id: productVariantID,
+        item_name: name,
+        price: priceVal / 100,
+        currency: currencyCode,
+        quantity: 1,
+        item_variant: product.variants?.[0]?.sku || productVariantID,
+      }]
+    });
 
     setAddedToCartMap((prevState) => ({
       ...prevState,

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Device from 'expo-device';
-import { Platform } from 'react-native';
+import { AppState, AppStateStatus, Platform } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -25,19 +25,68 @@ class Tracker {
     private isFirstVisit: boolean = false;
     private isSessionStart: boolean = false;
     private ready: boolean = false;
+    private appState: AppStateStatus = AppState.currentState;
 
     /**
      * Initialize Tracker
      */
     async init() {
+        if (this.ready) return;
+
         try {
             await this.initClientId();
             await this.initUserId();
             await this.initSession();
+
             this.ready = true;
             console.log(`[Tracker] Initialized. CID: ${this.cid}, SID: ${this.sid}, UID: ${this.userId}`);
+
+            // Send first_open if applicable
+            if (this.isFirstVisit) {
+                this.trackEvent('first_open', {});
+                // Note: trackEvent handles _fv param via isFirstVisit flag, 
+                // but checking it here explicitly ensures the event is sent.
+                // Actually, trackEvent consumes the flag. 
+                // If we send 'first_open', it will attach _fv=1.
+            } else if (this.isSessionStart) {
+                // If not first visit but new session on init (restart), send session_start
+                this.trackEvent('session_start', {});
+            }
+
+            // Setup AppState listener
+            AppState.addEventListener('change', this.handleAppStateChange);
         } catch (e) {
             console.error('[Tracker] Init failed:', e);
+        }
+    }
+
+    private handleAppStateChange = async (nextAppState: AppStateStatus) => {
+        if (
+            this.appState.match(/inactive|background/) &&
+            nextAppState === 'active'
+        ) {
+            console.log('[Tracker] App has come to the foreground!');
+            await this.checkSession();
+        }
+        this.appState = nextAppState;
+    };
+
+    private async checkSession() {
+        const now = Date.now();
+        const lastActiveStr = await AsyncStorage.getItem(STORAGE_KEYS.LAST_ACTIVE);
+        const lastActive = lastActiveStr ? parseInt(lastActiveStr, 10) : 0;
+
+        // Session timeout (30 mins)
+        if (now - lastActive > 1800000) {
+            console.log('[Tracker] Session expired, starting new session');
+            this.sid = this.generateSessionId();
+            this.isSessionStart = true;
+            await AsyncStorage.setItem(STORAGE_KEYS.SESSION_ID, this.sid);
+            // Fire session_start
+            this.trackEvent('session_start', {});
+        } else {
+            // Update activity
+            await this.heartbeat();
         }
     }
 
@@ -250,8 +299,8 @@ class Tracker {
 
     async logPageView(screenName: string) {
         // Simple page view
-        await this.trackEvent('page_view', {
-            page_location: `https://app.vendure.local/${screenName}`,
+        await this.trackEvent('screen_view', {
+            page_location: `https://storefront-app.zhibinyang.net/${screenName}`,
             page_title: screenName
         });
     }
