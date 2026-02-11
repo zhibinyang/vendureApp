@@ -1,18 +1,24 @@
 import React from "react";
 import { Text, View, StyleSheet, Image } from "react-native";
+import { formatCurrency } from "../../utils/currency";
 import { moderateScale } from "react-native-size-matters";
 
-export default function FreeShipping() {
+export default function FreeShipping({ currencyCode = 'EUR' }: { currencyCode?: string }) {
+  const currencySymbol = currencyCode === 'USD' ? '$' : '€'; // Simple fallback or use formatCurrency
+  // Better use formatCurrency with value 5000 (50.00)
+  // But wait, I can just use formatCurrency.
+  // I need to import it.
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>Free Shipping</Text>
-          <Text style={styles.description}>Order over 50€</Text>
+          <Text style={styles.description}>Order over {formatCurrency(5000, currencyCode)}</Text>
         </View>
         <View>
           <Image
-            source={require("../../../assets/freeShipping.jpg")} 
+            source={require("../../../assets/freeShipping.jpg")}
             style={styles.image}
           />
         </View>

@@ -116,10 +116,10 @@ export default function ProductCard({
               sortOrder === "ASC"
                 ? "sort-ascending"
                 : sortOrder === "DESC"
-                ? "sort-descending"
-                : "sort"
+                  ? "sort-descending"
+                  : "sort"
             }
-            size={moderateScale(22, 0.1)} 
+            size={moderateScale(22, 0.1)}
             color="#1F2937"
           />
         </TouchableOpacity>

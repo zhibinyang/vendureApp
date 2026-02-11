@@ -6,7 +6,7 @@ import { useQuery } from "@apollo/client";
 import CartInfo from "../tab_cart/cartInfo";
 import CartItem from "../tab_cart/cartItem";
 import { Button } from "../common/Buttons";
-import formatNumber from "../../../utils/formatNumber";
+import { formatCurrency } from "../../utils/currency";
 import { SHOW_ORDER } from "../../api/mutation/order";
 import { FlashList } from "@shopify/flash-list";
 import PageLoading from "../loading/PageLoading";
@@ -15,7 +15,7 @@ import { OrderLine } from "../../../utils/interface";
 import styles from "../tab_cart/style/styles.cart";
 import { moderateScale } from "react-native-size-matters";
 
-export default function CartScreen({navigation}) {
+export default function CartScreen({ navigation }) {
   const { data, loading, error, refetch } = useQuery(SHOW_ORDER);
   const { refetch: refetchCartCustomer } = useQuery(GET_CUSTOMER);
   const insets = useSafeAreaInsets();
@@ -69,6 +69,7 @@ export default function CartScreen({navigation}) {
                         item={item}
                         key={item.id}
                         refetchCart={refetchCart}
+                        currencyCode={order?.currencyCode}
                       />
                     )}
                     estimatedItemSize={900}
@@ -79,7 +80,7 @@ export default function CartScreen({navigation}) {
 
               {/* cart Info */}
               <View>
-                <CartInfo taxSummary={order?.taxSummary || []} />
+                <CartInfo taxSummary={order?.taxSummary || []} currencyCode={order?.currencyCode} />
               </View>
             </ScrollView>
 
@@ -88,10 +89,10 @@ export default function CartScreen({navigation}) {
               <Text style={styles.totalText}>Total:</Text>
               <View style={styles.totalPriceContainer}>
                 <Text style={styles.totalPriceWithTax}>
-                  {formatNumber(order?.totalWithTax)}€
+                  {formatCurrency(order?.totalWithTax, order?.currencyCode)}
                 </Text>
                 <Text style={styles.totalPrice}>
-                  {formatNumber(order?.total)}€
+                  {formatCurrency(order?.total, order?.currencyCode)}
                 </Text>
               </View>
               <Button

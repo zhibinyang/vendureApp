@@ -71,7 +71,7 @@ type RootStackParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-function PaymentConfirmationScreenWrapper({ navigation }) {
+function PaymentConfirmationScreenWrapper({ navigation, route }) {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -84,7 +84,7 @@ function PaymentConfirmationScreenWrapper({ navigation }) {
     }, [])
   );
 
-  return <PaymentConfirmationScreen navigation={navigation} />;
+  return <PaymentConfirmationScreen navigation={navigation} route={route} />;
 }
 
 function AccountCreatedScreenWrapper({ navigation }) {

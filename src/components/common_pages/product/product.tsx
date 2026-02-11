@@ -19,7 +19,7 @@ import { moderateScale } from "react-native-size-matters";
 import { tracker } from "../../../utils/tracker";
 
 export default function ProductScreen({ route, navigation }) {
-  const { products, selectedIndex, productVariantId, price, categoryID } = route.params;
+  const { products, selectedIndex, productVariantId, price, netPrice, categoryID, currencyCode } = route.params;
   const selectedProducts = products[selectedIndex];
 
   const insets = useSafeAreaInsets();
@@ -36,12 +36,12 @@ export default function ProductScreen({ route, navigation }) {
 
     // TRACKING: view_item
     tracker.trackEvent('view_item', {
-      currency: 'EUR',
-      value: Number(price) / 100, // Assuming price is in cents based on formatNumber usages usually, but need to verify. formatNumber usage in Cart suggests raw value. Let's assume raw for now or check usage.
+      currency: currencyCode || 'EUR',
+      value: Number(netPrice || price) / 100,
       items: [{
         item_id: selectedProducts.id,
         item_name: selectedProducts.name,
-        price: Number(price) / 100
+        price: Number(netPrice || price) / 100
       }]
     });
   }, [selectedProducts]);
@@ -62,12 +62,12 @@ export default function ProductScreen({ route, navigation }) {
 
     // TRACKING: add_to_cart
     tracker.trackEvent('add_to_cart', {
-      currency: 'EUR',
-      value: Number(price) / 100,
+      currency: currencyCode || 'EUR',
+      value: Number(netPrice || price) / 100,
       items: [{
         item_id: product.id,
         item_name: product.name,
-        price: Number(price) / 100,
+        price: Number(netPrice || price) / 100,
         quantity: 1
       }]
     });
@@ -104,9 +104,7 @@ export default function ProductScreen({ route, navigation }) {
 
           <View style={styles.priceContainer}>
             <Text style={styles.header}>Price: </Text>
-            <ProductPrice
-              price={price}
-            />
+            <ProductPrice price={selectedProducts.product.variants[0].priceWithTax} currencyCode={currencyCode} />
           </View>
 
           <View style={styles.infoContainer}>

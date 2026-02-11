@@ -39,6 +39,8 @@ export const GET_PRODUCTS_BY_CATEGORY_QUERY = gql`
         items {
           id
           name
+          price
+          currencyCode
           priceWithTax
           product {
             featuredAsset {
@@ -64,6 +66,8 @@ export const GET_SIMILAR_PRODUCTS = gql`
         items {
           id
           name
+          price
+          currencyCode
           priceWithTax
           product {
             featuredAsset {

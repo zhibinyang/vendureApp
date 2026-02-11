@@ -29,6 +29,12 @@ export const SEARCH_QUERY = gql`
         productAsset {
           preview
         }
+        price {
+          ... on SinglePrice {
+            value
+            currencyCode
+          }
+        }
         priceWithTax {
           ... on SinglePrice {
             value

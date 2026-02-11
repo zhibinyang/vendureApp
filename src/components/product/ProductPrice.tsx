@@ -2,20 +2,20 @@ import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { moderateScale } from 'react-native-size-matters';
 
-import formatNumber from '../../../utils/formatNumber';
+import { formatCurrency } from '../../utils/currency';
 
 interface ProductPriceProps {
   price: number;
+  currencyCode?: string;
 }
 
-const ProductPrice: React.FC<ProductPriceProps> = ({ price }) => {
+const ProductPrice: React.FC<ProductPriceProps> = ({ price, currencyCode = 'EUR' }) => {
   return (
     <View style={[styles.container && styles.columnReverse]}>
       <View style={styles.priceContainer}>
         <Text style={styles.priceText}>
-          {formatNumber(price)}
+          {formatCurrency(price, currencyCode)}
         </Text>
-        <Text>€</Text>
       </View>
     </View>
   );
@@ -40,3 +40,4 @@ const styles = StyleSheet.create({
 });
 
 export default ProductPrice;
+

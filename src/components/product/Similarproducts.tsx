@@ -61,6 +61,8 @@ const SimilarProducts: React.FC<SimilarProductsProps> = ({
                     selectedIndex: index,
                     productVariantId: items_?.id,
                     price: items_.priceWithTax,
+                    netPrice: items_.price,
+                    currencyCode: items_.currencyCode,
                     categoryID: categoryID
                   });
                 }}
@@ -86,7 +88,7 @@ const SimilarProducts: React.FC<SimilarProductsProps> = ({
 
                   <View style={styles.priceContainer}>
                     <Text style={styles.priceText}>Price: </Text>
-                    <ProductPrice price={item.priceWithTax} />
+                    <ProductPrice price={item.priceWithTax} currencyCode={items_.currencyCode} />
                   </View>
                 </View>
               </TouchableOpacity>

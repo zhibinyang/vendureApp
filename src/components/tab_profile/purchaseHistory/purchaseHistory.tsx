@@ -9,7 +9,7 @@ import {
 import { useQuery } from "@apollo/client";
 
 import formatData from "../../../../utils/formatData";
-import formatNumber from "../../../../utils/formatNumber";
+import { formatCurrency } from "../../../utils/currency";
 import PageLoading from "../../loading/PageLoading";
 import { PURCHASE_HISTORY } from "../../../api/mutation/purchaseHistory";
 import ProductPrice from "../../product/ProductPrice";
@@ -20,6 +20,7 @@ type OrderItem = {
   code: string;
   createdAt: string;
   totalWithTax: number;
+  currencyCode: string;
   state: string;
   lines: {
     id: string;
@@ -81,12 +82,12 @@ export default function UserHistoryScreen() {
                 Date placed: {formatData(new Date(item.createdAt))}
               </Text>
               <Text style={styles.total}>
-                Total Sum: {formatNumber(item.totalWithTax)}€
+                Total Sum: {formatCurrency(item.totalWithTax, item.currencyCode || 'EUR')}
               </Text>
               <Text style={styles.orderCode}>Order num.: {item.code}</Text>
             </View>
             <View style={styles.row}>
-              <Text style={styles.state}>State: <Text style={{color: "#666", fontWeight: 'normal'}}>{item.state}</Text></Text>
+              <Text style={styles.state}>State: <Text style={{ color: "#666", fontWeight: 'normal' }}>{item.state}</Text></Text>
             </View>
           </TouchableOpacity>
 

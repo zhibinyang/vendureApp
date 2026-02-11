@@ -22,7 +22,7 @@ import SimilarProducts from "./Similarproducts";
 import { moderateScale } from "react-native-size-matters";
 
 export default function ProductSearchedScreen({ route, navigation }) {
-  const { productId, productVariantID, name, price, categoryID } = route.params;
+  const { productId, productVariantID, name, price, categoryID, currencyCode } = route.params;
   const { data, loading, error } = useQuery(PRODUCT_SEARCHED_QUERY, {
     variables: { id: productId },
   });
@@ -98,7 +98,7 @@ export default function ProductSearchedScreen({ route, navigation }) {
 
           <View style={styles.priceContainer}>
             <Text style={styles.header}>Price: </Text>
-            <ProductPrice price={price} />
+            <ProductPrice price={price} currencyCode={currencyCode} />
           </View>
 
           <View style={styles.infoContainer}>

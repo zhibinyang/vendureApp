@@ -34,9 +34,11 @@ export const GET_BANNER_1_QUERY = gql`
             }
             description
             variants {
+              price
               priceWithTax
               stockLevel
               sku
+              currencyCode
             }
           }
         }
@@ -84,6 +86,7 @@ export const GET_BANNER_3_QUERY = gql`
             }
             description
             variants {
+              price
               priceWithTax
               stockLevel
               sku

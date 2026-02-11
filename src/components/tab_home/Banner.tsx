@@ -46,6 +46,8 @@ const Banner: React.FC<BannerProps> = ({ navigation, query, title }) => {
                   selectedIndex: index,
                   productVariantId: items_.id,
                   price: item.variants[0].priceWithTax,
+                  netPrice: item.variants[0].price,
+                  currencyCode: item.variants[0].currencyCode,
                   categoryID: categoryID
                 });
               }}
@@ -71,7 +73,7 @@ const Banner: React.FC<BannerProps> = ({ navigation, query, title }) => {
 
                 <View style={styles.priceContainer}>
                   <Text style={styles.priceText}>Price: </Text>
-                  <ProductPrice price={item.variants[0].priceWithTax} />
+                  <ProductPrice price={item.variants[0].priceWithTax} currencyCode={item.variants[0].currencyCode} />
                 </View>
               </View>
             </TouchableOpacity>

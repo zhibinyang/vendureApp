@@ -17,7 +17,7 @@ import {
 } from "../../api/mutation/payments";
 import { Feather, Fontisto } from "@expo/vector-icons";
 import { SHOW_ORDER } from "../../api/mutation/order";
-import formatNumber from "../../../utils/formatNumber";
+import { formatCurrency } from "../../utils/currency";
 import Icons from "../common/Icons";
 import PageLoading from "../loading/PageLoading";
 import { Address, ShippingMethod, OrderLine } from "../../../utils/interface";
@@ -130,6 +130,7 @@ export default function PaymentScreen({ navigation }) {
       navigation.navigate("PaymentConfirmationScreen", {
         order: {
           code: order.code,
+          subTotal: order.subTotal,
           totalWithTax: order.totalWithTax + (selectedMethodPrice || 0),
           currencyCode: order.currencyCode || 'EUR',
           lines: order.lines
@@ -242,7 +243,7 @@ export default function PaymentScreen({ navigation }) {
                     >
                       <Text style={styles.methodName}>{method.name}</Text>
                       <Text style={styles.methodPrice}>
-                        Price: {formatNumber(method.price)}€
+                        Price: {formatCurrency(method.price, order.currencyCode || 'EUR')}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -259,8 +260,7 @@ export default function PaymentScreen({ navigation }) {
               <View style={styles.infoRow}>
                 <Text style={styles.label}>Subtotal</Text>
                 <View style={styles.priceContainer}>
-                  <Text>{formatNumber(order.totalWithTax)}</Text>
-                  <Text style={styles.currency}>€</Text>
+                  <Text>{formatCurrency(order.totalWithTax, order.currencyCode || 'EUR')}</Text>
                 </View>
               </View>
               <View style={styles.infoRow}>
@@ -268,9 +268,8 @@ export default function PaymentScreen({ navigation }) {
                 <View style={styles.priceContainer}>
                   <Text>
                     {selectedMethodPrice
-                      ? formatNumber(selectedMethodPrice)
+                      ? formatCurrency(selectedMethodPrice, order.currencyCode || 'EUR')
                       : "selected a shipping method"}
-                    €
                   </Text>
                 </View>
               </View>
@@ -278,11 +277,11 @@ export default function PaymentScreen({ navigation }) {
                 <Text style={styles.label}>Total</Text>
                 <View style={styles.priceContainer}>
                   <Text>
-                    {formatNumber(
-                      order.totalWithTax + (selectedMethodPrice || 0)
+                    {formatCurrency(
+                      order.totalWithTax + (selectedMethodPrice || 0),
+                      order.currencyCode || 'EUR'
                     )}
                   </Text>
-                  <Text style={styles.currency}>€</Text>
                 </View>
               </View>
               <Text style={styles.title}>Payment Information</Text>

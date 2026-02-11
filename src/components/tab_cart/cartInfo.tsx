@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import styles from "./style/styles.cart";
 
-import formatNumber from "../../../utils/formatNumber";
+import { formatCurrency } from "../../utils/currency";
 
 interface TaxSummary {
   description: string;
@@ -13,9 +13,10 @@ interface TaxSummary {
 
 interface Order {
   taxSummary: TaxSummary[];
+  currencyCode?: string;
 }
 
-const CartInfo: React.FC<Order> = ({ taxSummary }) => {
+const CartInfo: React.FC<Order> = ({ taxSummary, currencyCode = 'EUR' }) => {
   return (
     <View style={styles.container}>
       {taxSummary.map((summary, index) => (
@@ -37,16 +38,14 @@ const CartInfo: React.FC<Order> = ({ taxSummary }) => {
           <View style={styles.infoRow_CartInfo}>
             <Text>Taxe Base</Text>
             <View style={styles.priceContainer}>
-              <Text style={styles.label}>{formatNumber(summary.taxBase)}</Text>
-              <Text style={styles.currency}>€</Text>
+              <Text style={styles.label}>{formatCurrency(summary.taxBase, currencyCode)}</Text>
             </View>
           </View>
 
-          <View style={[styles.infoRow_CartInfo, {borderBottomColor: '#fff'}]}>
+          <View style={[styles.infoRow_CartInfo, { borderBottomColor: '#fff' }]}>
             <Text style={styles.label}>Total Taxes</Text>
             <View style={styles.priceContainer}>
-              <Text>{formatNumber(summary.taxTotal)}</Text>
-              <Text style={styles.currency}>€</Text>
+              <Text>{formatCurrency(summary.taxTotal, currencyCode)}</Text>
             </View>
           </View>
         </View>

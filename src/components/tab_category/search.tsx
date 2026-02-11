@@ -26,6 +26,11 @@ interface Product {
   productAsset: {
     preview: string;
   };
+  price: {
+    value: number;
+    currencyCode: string;
+    __typename: string;
+  };
   priceWithTax: {
     value: number;
     __typename: string;
@@ -106,7 +111,8 @@ export default function SearchScreen({ navigation }) {
                             item?.priceWithTax.__typename === "SinglePrice"
                               ? item?.priceWithTax.value
                               : 0,
-                          categoryID: item?.collectionIds[0]
+                          categoryID: item?.collectionIds[0],
+                          currencyCode: item?.price?.currencyCode || 'EUR'
                         })
                       }
                     >
@@ -138,6 +144,7 @@ export default function SearchScreen({ navigation }) {
                               ? item?.priceWithTax.value
                               : 0
                           }
+                          currencyCode={item?.price?.currencyCode || 'EUR'}
                         />
                       </View>
                     </TouchableOpacity>

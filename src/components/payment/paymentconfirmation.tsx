@@ -12,17 +12,17 @@ export default function PaymentConfirmationScreen({ navigation, route }) {
 
   useEffect(() => {
     if (route?.params?.order) {
-      const { code, totalWithTax, currencyCode, lines } = route.params.order;
+      const { code, subTotal, currencyCode, lines } = route.params.order;
 
       // TRACKING: purchase
       tracker.trackEvent('purchase', {
         transaction_id: code,
-        value: Number(totalWithTax) / 100,
+        value: Number(subTotal) / 100,
         currency: currencyCode,
         items: lines.map(line => ({
           item_id: line.productVariant.id,
           item_name: line.productVariant.name,
-          price: line.unitPriceWithTax / 100,
+          price: line.unitPrice / 100,
           quantity: line.quantity
         }))
       });

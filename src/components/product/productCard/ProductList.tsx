@@ -7,7 +7,7 @@ import {
   Text,
   Image
 } from "react-native";
-import { ProductCard as Product  } from "../../../../utils/interface";
+import { ProductCard as Product } from "../../../../utils/interface";
 import { moderateScale } from "react-native-size-matters";
 import { useMutation } from "@apollo/client";
 
@@ -78,6 +78,8 @@ const ProductList: React.FC<ProductListProps> = ({
                   selectedIndex: index,
                   productVariantId: items_?.id,
                   price: items_.priceWithTax,
+                  netPrice: items_.price,
+                  currencyCode: items_.currencyCode,
                   categoryID: data?.collection?.id,
                 })
               }
@@ -102,7 +104,7 @@ const ProductList: React.FC<ProductListProps> = ({
                   </Text>
                   <View style={styles.priceContainer}>
                     {item.variants[0].stockLevel !== 0 ? (
-                      <ProductPrice price={items_.priceWithTax} />
+                      <ProductPrice price={items_.priceWithTax} currencyCode={items_.currencyCode} />
                     ) : (
                       <Text style={styles.notAvailableText}>Not available</Text>
                     )}

@@ -2,27 +2,30 @@ import React, { memo } from "react";
 import { Text, View, Image } from "react-native";
 import CartButtons from "./cartButtons";
 import { OrderLine } from "../../../utils/interface";
-import formatNumber from "../../../utils/formatNumber";
+import { formatCurrency } from "../../utils/currency";
 import styles from "./style/styles.cart";
 import { moderateScale } from "react-native-size-matters";
 
 interface CartItemProps {
   item: OrderLine;
   refetchCart: () => void;
+  currencyCode?: string;
 }
 
-const CartItem = memo(({ item, refetchCart }: CartItemProps) => {
+const CartItem = memo(({ item, refetchCart, currencyCode = 'EUR' }: CartItemProps) => {
   const unitPriceWithTax = item.productVariant.priceWithTax ?? 0;
   const discountAmountWithTax = item.discounts[0]?.amountWithTax ?? 0;
   const totalPriceWithDiscountAndQuantity =
     (unitPriceWithTax - discountAmountWithTax) * item.quantity;
-  const priceWithDiscountAndQuantityFormatted = formatNumber(
-    totalPriceWithDiscountAndQuantity
+  const priceWithDiscountAndQuantityFormatted = formatCurrency(
+    totalPriceWithDiscountAndQuantity,
+    currencyCode
   );
-  const totalPriceFormatted = formatNumber(
-    (item.productVariant.priceWithTax ?? 0) * item.quantity
+  const totalPriceFormatted = formatCurrency(
+    (item.productVariant.priceWithTax ?? 0) * item.quantity,
+    currencyCode
   );
-  const discountFormatted = formatNumber(discountAmountWithTax);
+  const discountFormatted = formatCurrency(discountAmountWithTax, currencyCode);
 
   return (
     <View style={styles.containerItem}>
@@ -52,17 +55,17 @@ const CartItem = memo(({ item, refetchCart }: CartItemProps) => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoText}>Price: {totalPriceFormatted}</Text>
-            <Text>€</Text>
+
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoText}>Discounts: {discountFormatted}</Text>
-            <Text>€</Text>
+
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoText}>
               Total: {priceWithDiscountAndQuantityFormatted}
             </Text>
-            <Text>€</Text>
+
           </View>
         </View>
       </View>

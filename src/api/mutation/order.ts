@@ -29,6 +29,8 @@ export const ADD_TO_CART = gql`
 export const SHOW_ORDER = gql`
   query Order {
     activeOrder {
+      code
+      subTotal
       total
       totalWithTax
       taxSummary {
@@ -47,6 +49,7 @@ export const SHOW_ORDER = gql`
           priceWithTax
         }
         proratedUnitPriceWithTax
+        unitPriceWithTax
         discounts {
           amountWithTax
         }
