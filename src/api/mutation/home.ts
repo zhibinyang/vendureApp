@@ -7,6 +7,8 @@ export const GET_SLIDERS = gql`
         options: { take: 5, filter: { name: { notContains: "Balloon" } } }
       ) {
         items {
+          priceWithTax
+          currencyCode
           product {
             id
             name
@@ -64,6 +66,7 @@ export const GET_BANNER_2_QUERY = gql`
               priceWithTax
               stockLevel
               sku
+              currencyCode
             }
           }
         }
@@ -90,6 +93,7 @@ export const GET_BANNER_3_QUERY = gql`
               priceWithTax
               stockLevel
               sku
+              currencyCode
             }
           }
         }

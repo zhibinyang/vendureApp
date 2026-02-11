@@ -30,6 +30,7 @@ export const SHOW_ORDER = gql`
   query Order {
     activeOrder {
       code
+      currencyCode
       subTotal
       total
       totalWithTax
