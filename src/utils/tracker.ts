@@ -45,12 +45,7 @@ class Tracker {
     private async initClientId() {
         let cid = await AsyncStorage.getItem(STORAGE_KEYS.CLIENT_ID);
         if (!cid) {
-            if (Platform.OS === 'ios') {
-                cid = await Application.getIosIdForVendorAsync();
-            } else {
-                cid = Application.getAndroidId();
-            }
-            if (!cid) cid = uuidv4();
+            cid = uuidv4();
             await AsyncStorage.setItem(STORAGE_KEYS.CLIENT_ID, cid);
         }
         this.cid = cid;
@@ -150,16 +145,20 @@ class Tracker {
             query.append(`ep.${key}`, strValue);
         });
 
+        if (SGTM_PREVIEW_ENABLED === 'true') {
+            query.append('_dbg', '1');
+        }
+
         const url = `${SGTM_ENDPOINT}?${query.toString()}`;
 
         if (__DEV__) {
             console.log(`[Tracker] Sending: ${eventName}`, url);
         }
 
-
-
         try {
-            const headers: Record<string, string> = {};
+            const headers: Record<string, string> = {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
+            };
             if (SGTM_PREVIEW_ENABLED === 'true' && SGTM_PREVIEW_HEADER) {
                 headers['x-gtm-server-preview'] = SGTM_PREVIEW_HEADER;
             }
