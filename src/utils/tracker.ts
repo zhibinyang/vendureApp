@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Application from 'expo-application';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import 'react-native-get-random-values';
@@ -17,7 +16,7 @@ const STORAGE_KEYS = {
 };
 
 // Types
-type EventParams = Record<string, string | number | boolean | object>;
+type EventParams = Record<string, any>;
 
 class Tracker {
     private cid: string | null = null;
@@ -99,6 +98,28 @@ class Tracker {
         }
     }
 
+    // Custom Item Serializer for GA4 ("pr" parameter style)
+    // Ref: pr1=idL2201308~nmLaptop~vaLaptop%2013%20inch%208GB~pr1299~qt1
+    private serializeItem(item: any): string {
+        const parts: string[] = [];
+
+        // Mapping based on user example
+        if (item.item_id) parts.push(`id${item.item_id}`);
+        if (item.item_name) parts.push(`nm${item.item_name}`);
+        if (item.item_brand) parts.push(`br${item.item_brand}`);
+        if (item.item_category) parts.push(`ca${item.item_category}`);
+        if (item.item_variant) parts.push(`va${item.item_variant}`);
+        if (item.price !== undefined) parts.push(`pr${item.price}`);
+        if (item.quantity !== undefined) parts.push(`qt${item.quantity}`);
+        if (item.coupon) parts.push(`cp${item.coupon}`);
+
+        // Other fields? discount?
+        if (item.discount !== undefined) parts.push(`ds${item.discount}`);
+
+        // Join with ~
+        return parts.join('~');
+    }
+
     async trackEvent(eventName: string, params: EventParams = {}) {
         if (!this.ready) {
             console.warn('[Tracker] Not ready, waiting for init...');
@@ -114,9 +135,10 @@ class Tracker {
         if (this.userId) {
             query.append('uid', this.userId);
         }
-        query.append('en', eventName);
+        query.append('en', eventName); // Event Name
         query.append('sid', this.sid || 'unknown');
 
+        // Session Control
         if (this.isSessionStart) {
             query.append('_ss', '1');
             this.isSessionStart = false;
@@ -126,6 +148,27 @@ class Tracker {
             this.isFirstVisit = false;
         }
 
+        // Custom Item Processing
+        if (params.items && Array.isArray(params.items)) {
+            params.items.forEach((item, index) => {
+                const serialized = this.serializeItem(item);
+                if (serialized) {
+                    query.append(`pr${index + 1}`, serialized);
+                }
+            });
+        }
+
+        // Attribution
+        const attributionId = await AsyncStorage.getItem(STORAGE_KEYS.ATTRIBUTION_ID);
+        if (attributionId) {
+            query.append('ep.click_id', attributionId);
+        }
+
+        // Page Tracking (if passed)
+        if (params.page_location) query.append('dl', String(params.page_location));
+        if (params.page_title) query.append('dt', String(params.page_title));
+
+        // Other Parameters
         const deviceParams = {
             platform: 'mobile_app',
             os_name: Device.osName || Platform.OS,
@@ -133,26 +176,48 @@ class Tracker {
             device_model: Device.modelName || 'unknown',
         };
 
-        const attributionId = await AsyncStorage.getItem(STORAGE_KEYS.ATTRIBUTION_ID);
-        if (attributionId) {
-            query.append('ep.click_id', attributionId);
-        }
-
         const allParams = { ...deviceParams, ...params };
 
         Object.entries(allParams).forEach(([key, value]) => {
+            if (key === 'items') return; // Handled separately
+            if (key === 'page_location' || key === 'page_title') return; // Handled separately
+
             const strValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
-            query.append(`ep.${key}`, strValue);
+            // Protocol check: core params vs custom params
+            if (['transaction_id', 'value', 'currency', 'tax', 'shipping'].includes(key)) {
+                // Should these be ep.*?
+                // In standard MPv2, 'ep.' is for custom event params.
+                // 'value' might be 'ep.value' if using 'en' param for event name.
+                // User example: epn.value=1299. 'epn'? 
+                // Ah, user example: `epn.value=1299`.
+                // Wait, really? `epn.value`. 
+                // That looks like `ep` (event param) typed as `n` (number).
+                // `epn.value` = Event Param Number 'value'.
+                // If I just perform `ep.value`, GA4 treats it as string/auto?
+                // Let's stick to `ep.` for safety unless we know precise type mappings for MPv2.
+                // Or maybe `epn` is safer for numbers.
+                // Let's use `ep.` for now as it is standard custom param.
+                query.append(`ep.${key}`, strValue);
+            } else {
+                query.append(`ep.${key}`, strValue);
+            }
         });
 
+        // Debug
         if (SGTM_PREVIEW_ENABLED === 'true') {
             query.append('_dbg', '1');
         }
 
-        const url = `${SGTM_ENDPOINT}?${query.toString()}`;
+        // Post-process query string to allow tilde (~) in pr{N} params without encoding
+        // URLSearchParams encodes ~ as %7E. We revert it for GTAG compatibility.
+        let queryString = query.toString();
+        queryString = queryString.replace(/%7E/g, '~');
+
+        const url = `${SGTM_ENDPOINT}?${queryString}`;
 
         if (__DEV__) {
             console.log(`[Tracker] Sending: ${eventName}`, url);
+            // console.log('Params:', params);
         }
 
         try {
@@ -181,6 +246,14 @@ class Tracker {
     async clearAttributionId() {
         await AsyncStorage.removeItem(STORAGE_KEYS.ATTRIBUTION_ID);
         console.log('[Tracker] Attribution ID cleared');
+    }
+
+    async logPageView(screenName: string) {
+        // Simple page view
+        await this.trackEvent('page_view', {
+            page_location: `https://app.vendure.local/${screenName}`,
+            page_title: screenName
+        });
     }
 }
 
