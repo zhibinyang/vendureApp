@@ -41,7 +41,7 @@ You can edit the data in the second link, live demo, in the ADMIN UI.
 ## System Requirements
    - Node.js (v14.x or higher)
    - Expo CLI
-   - Npm (recommended)
+   - Yarn (recommended)
 
 ## Project Configuration
 
@@ -54,7 +54,7 @@ You can edit the data in the second link, live demo, in the ADMIN UI.
 2. Install the dependencies:
 
    ```bash
-      npm install
+      yarn install
    ```
 ## Backend Configuration
 
