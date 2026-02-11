@@ -127,7 +127,14 @@ export default function PaymentScreen({ navigation }) {
         variables: { method: "standard-payment" },
       });
 
-      navigation.navigate("PaymentConfirmationScreen");
+      navigation.navigate("PaymentConfirmationScreen", {
+        order: {
+          code: order.code,
+          totalWithTax: order.totalWithTax + (selectedMethodPrice || 0),
+          currencyCode: order.currencyCode || 'EUR',
+          lines: order.lines
+        }
+      });
       refetchCart();
       refetchCustomer();
     } catch (error) {
@@ -197,7 +204,7 @@ export default function PaymentScreen({ navigation }) {
                   style={[
                     styles.addressContainer,
                     selectedAddressId === address.id &&
-                      styles.selectedAddressContainer,
+                    styles.selectedAddressContainer,
                   ]}
                   onPress={() => setSelectedAddressId(address.id)}
                 >
@@ -229,7 +236,7 @@ export default function PaymentScreen({ navigation }) {
                       style={[
                         styles.shippingMethod,
                         selectedShippingMethod === method &&
-                          styles.selectedShippingMethod,
+                        styles.selectedShippingMethod,
                       ]}
                       onPress={() => setSelectedShippingMethod(method)}
                     >

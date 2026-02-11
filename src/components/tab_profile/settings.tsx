@@ -14,6 +14,7 @@ import { GET_CUSTOMER } from "../../api/mutation/customer";
 import { SHOW_ORDER } from "../../api/mutation/order";
 import { Context } from "../../context/context";
 import * as SecureStore from "expo-secure-store";
+import { tracker } from "../../utils/tracker";
 
 export default function SettingScreen({ navigation }) {
   const { dispatch } = useContext(Context);
@@ -33,6 +34,9 @@ export default function SettingScreen({ navigation }) {
         await refetchProfile();
         await refetchCart();
         await removeLogin();
+        // TRACKING: Clear User ID
+        tracker.setUserId(null);
+
         setIsLogged(false);
         navigation.navigate("Profile");
       } catch (error) {
@@ -130,6 +134,7 @@ const styles = StyleSheet.create({
     padding: moderateScale(14, 0.1),
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: moderateScale(10, 0.1),
   },
   TouchableOpacitybtnText: {
     color: "#FFF",

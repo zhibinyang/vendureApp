@@ -16,11 +16,11 @@ let languageCode: string | undefined;
 
 const httpLink = new HttpLink({
   uri: () => {
-      if (languageCode) {
-          return `${API}?languageCode=${languageCode}`;
-      } else {
-          return API;
-      }
+    if (languageCode) {
+      return `${API}?languageCode=${languageCode}`;
+    } else {
+      return API;
+    }
   },
   credentials: 'include',
 });
@@ -29,14 +29,12 @@ const httpLink = new HttpLink({
 // if it is returned by the server.
 const afterwareLink = new ApolloLink((operation, forward) => {
   return forward(operation).map((response) => {
-      const context = operation.getContext();
-      const authHeader = context.response.headers.get('vendure-auth-token');
-      if (authHeader) {
-          // If the auth token has been returned by the Vendure
-          // server, we store it in localStorage
-          SecureStore.setItem(AUTH_TOKEN_KEY, authHeader);
-      }
-      return response;
+    const context = operation.getContext();
+    const authHeader = context.response.headers.get('vendure-auth-token');
+    if (authHeader) {
+      SecureStore.setItemAsync(AUTH_TOKEN_KEY, authHeader);
+    }
+    return response;
   });
 });
 
@@ -57,19 +55,19 @@ export function setLanguageCode(value: string | undefined) {
 
 export const client = new ApolloClient({
   link: ApolloLink.from([
-      setContext((request, operation) => {
-          const authToken = SecureStore.getItem(AUTH_TOKEN_KEY);
-          let headers: Record<string, any> = {};
-          if (authToken) {
-              headers.authorization = `Bearer ${authToken}`;
-          }
-          if (channelToken) {
-              headers['vendure-token'] = channelToken;
-          }
-          return { headers };
-      }),
-      afterwareLink,
-      httpLink,
+    setContext(async (request, operation) => {
+      const authToken = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
+      let headers: Record<string, any> = {};
+      if (authToken) {
+        headers.authorization = `Bearer ${authToken}`;
+      }
+      if (channelToken) {
+        headers['vendure-token'] = channelToken;
+      }
+      return { headers };
+    }),
+    afterwareLink,
+    httpLink,
   ]),
   cache: new InMemoryCache({
     typePolicies: {

@@ -1,11 +1,36 @@
 import React, { useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { moderateScale } from "react-native-size-matters";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import { MaterialIcons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 
-export default function PaymentConfirmationScreen({ navigation }) {
+import { tracker } from "../../utils/tracker";
+import { useEffect } from "react";
+
+export default function PaymentConfirmationScreen({ navigation, route }) {
   const confettiRef = useRef(null);
+
+  useEffect(() => {
+    if (route?.params?.order) {
+      const { code, totalWithTax, currencyCode, lines } = route.params.order;
+
+      // TRACKING: purchase
+      tracker.trackEvent('purchase', {
+        transaction_id: code,
+        value: Number(totalWithTax) / 100,
+        currency: currencyCode,
+        items: lines.map(line => ({
+          item_id: line.productVariant.id,
+          item_name: line.productVariant.name,
+          price: line.unitPriceWithTax / 100,
+          quantity: line.quantity
+        }))
+      });
+
+      // Clear Attribution
+      tracker.clearAttributionId();
+    }
+  }, [route?.params?.order]);
 
   const handleContinueShopping = () => {
     navigation.navigate("Index");
@@ -14,10 +39,10 @@ export default function PaymentConfirmationScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Icon name="check-circle" size={moderateScale(24, 0.1)} color="#4CAF50" />
+        <MaterialIcons name="check-circle" size={moderateScale(24, 0.1)} color="#4CAF50" />
         <Text style={styles.title}>Successful purchase</Text>
       </View>
-      
+
       <ConfettiCannon
         ref={confettiRef}
         count={200}

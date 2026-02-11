@@ -16,6 +16,8 @@ import { moderateScale } from "react-native-size-matters";
 //import Reviews from "./Reviews";
 //import AddToCartOperation from "./AddToCartOperation";
 
+import { tracker } from "../../../utils/tracker";
+
 export default function ProductScreen({ route, navigation }) {
   const { products, selectedIndex, productVariantId, price, categoryID } = route.params;
   const selectedProducts = products[selectedIndex];
@@ -31,6 +33,17 @@ export default function ProductScreen({ route, navigation }) {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({ y: 0, animated: true });
     }
+
+    // TRACKING: view_item
+    tracker.trackEvent('view_item', {
+      currency: 'EUR',
+      value: Number(price) / 100, // Assuming price is in cents based on formatNumber usages usually, but need to verify. formatNumber usage in Cart suggests raw value. Let's assume raw for now or check usage.
+      items: [{
+        item_id: selectedProducts.id,
+        item_name: selectedProducts.name,
+        price: Number(price) / 100
+      }]
+    });
   }, [selectedProducts]);
 
   const [addedToCartMap, setAddedToCartMap] = useState<{
@@ -40,12 +53,24 @@ export default function ProductScreen({ route, navigation }) {
   const [addToCart] = useMutation(ADD_TO_CART, {
     variables: { id_: productVariantId, quantity_: 1 },
   });
-  
+
   const { refetch } = useQuery(SHOW_ORDER);
 
   const handleAddToCart = (product) => {
     addToCart({ variables: { id_: product.id, quantity_: 1 } });
     refetch();
+
+    // TRACKING: add_to_cart
+    tracker.trackEvent('add_to_cart', {
+      currency: 'EUR',
+      value: Number(price) / 100,
+      items: [{
+        item_id: product.id,
+        item_name: product.name,
+        price: Number(price) / 100,
+        quantity: 1
+      }]
+    });
 
     setAddedToCartMap((prevState) => ({
       ...prevState,
@@ -111,7 +136,7 @@ export default function ProductScreen({ route, navigation }) {
           </Text>
           <Icons.Feather
             name="shopping-cart"
-            size={moderateScale(22, 0.1)} 
+            size={moderateScale(22, 0.1)}
             style={{ color: "#F59E0B" }}
           />
         </TouchableOpacity>

@@ -8,6 +8,7 @@ import { Alert } from "react-native";
 import { GET_CUSTOMER } from "../../api/mutation/customer";
 import { SHOW_ORDER } from "../../api/mutation/order";
 import PageLoading from "../loading/PageLoading";
+import { tracker } from "../../utils/tracker";
 
 interface AuthScreenProps {
   children: React.ReactNode;
@@ -52,8 +53,15 @@ export default function AuthScreen({ children, navigation }: AuthScreenProps) {
       const token = await SecureStore.getItemAsync("token");
 
       if (token) {
-        await getCustomer();
+        // Use refetch-like behavior or await getCustomer
+        const { data: customerData } = await getCustomer();
         await getOrder();
+
+        // TRACKING: Set User ID
+        if (customerData?.activeCustomer?.id) {
+          tracker.setUserId(customerData.activeCustomer.id);
+        }
+
         setIsLogged(true);
       } else {
         await logoutMutation();

@@ -13,6 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@apollo/client";
 import { moderateScale } from "react-native-size-matters";
 import * as SecureStore from "expo-secure-store";
+import { tracker } from "../../utils/tracker";
 
 import { LOGIN_MUTATION } from "../../api/mutation/auth";
 import { Button } from "../common/Buttons";
@@ -58,11 +59,18 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       try {
         const { login } = data;
         if (login.__typename === "CurrentUser") {
-          await refetchProfile();
+          // Refetch to get fresh customer data including ID
+          const { data: customerData } = await refetchProfile();
           await refetchCart();
+
+          // TRACKING: Set User ID
+          if (customerData?.activeCustomer?.id) {
+            tracker.setUserId(customerData.activeCustomer.id);
+          }
+
           setIsLogged(true);
           navigation.navigate("Profile");
-          await makeAuthenticatedRequest(`${process.env.API_URL}`); 
+          await makeAuthenticatedRequest(`${process.env.API_URL}`);
         } else {
           Alert.alert("Erro", "Utilizador ou senha inválidos.");
         }
@@ -116,7 +124,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       throw error;
     }
   }
-  
+
   async function makeAuthenticatedRequest(url: string, options: RequestInit = {}) {
     try {
       const authToken = await getAuthToken();
